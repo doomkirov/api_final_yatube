@@ -1,17 +1,23 @@
 # TODO:  Напишите свой вариант
-from sqlite3 import IntegrityError
-from rest_framework import viewsets, permissions, serializers
+from rest_framework import viewsets, permissions, pagination, filters
+from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 
-from posts.models import Post, Group, Follow, User
-from .serializers import CommentSerializer, FollowSerializer, GroupSerializer, PostSerializer
-from .permissions import IsAbleToFolow, IsAuthorOrReadOnly
+from posts.models import Post, Group, User
+from .serializers import (
+    CommentSerializer,
+    FollowSerializer,
+    GroupSerializer,
+    PostSerializer
+)
+from .permissions import IsAuthorOrReadOnly
 
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticated & IsAuthorOrReadOnly]
+    permission_classes = [IsAuthorOrReadOnly]
+    pagination_class = pagination.LimitOffsetPagination
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -24,26 +30,23 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
 
 class FollowViewSet(viewsets.ModelViewSet):
     serializer_class = FollowSerializer
-    permission_classes = [permissions.IsAuthenticated & IsAbleToFolow]
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+    search_fields = ('following__username',)
 
     def get_queryset(self):
         return self.request.user.follower.all()
 
     def perform_create(self, serializer):
-        try:
-            serializer.save(
-                user=self.request.user,
-                author=User.objects.get(username=self.request.data['author'])
-            )
-        except Exception:
-            return IntegrityError(
-                'Нельзя подписаться на одного пользователя дважды!'
-            )
+        serializer.save(
+            user=self.request.user,
+            following=User.objects.get(username=self.request.data['following'])
+        )
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [permissions.IsAuthenticated & IsAuthorOrReadOnly]
+    permission_classes = [IsAuthorOrReadOnly]
 
     def get_post(self):
         return get_object_or_404(Post, id=self.kwargs.get('post_id'))
