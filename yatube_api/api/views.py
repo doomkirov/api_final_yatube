@@ -1,9 +1,8 @@
-# TODO:  Напишите свой вариант
-from rest_framework import viewsets, permissions, pagination, filters
+from rest_framework import viewsets, permissions, pagination, filters, generics
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 
-from posts.models import Post, Group, User
+from posts.models import Post, Group
 from .serializers import (
     CommentSerializer,
     FollowSerializer,
@@ -28,7 +27,7 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = GroupSerializer
 
 
-class FollowViewSet(viewsets.ModelViewSet):
+class FollowViewSet(generics.ListCreateAPIView):
     serializer_class = FollowSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
@@ -40,7 +39,6 @@ class FollowViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(
             user=self.request.user,
-            following=User.objects.get(username=self.request.data['following'])
         )
 
 
