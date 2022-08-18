@@ -1,74 +1,43 @@
-# api_final
+# api_final_yatube
 ### Описание проекта:
 
-Проект создан для того, чтобы объединить людей в одну сеть
+Проект создан для того, чтобы постичь практическим путём все возможности создания максимально комфортного API в своём собственном python-django приложении.
 
-```
-git clone https://github.com/yandex-praktikum/kittygram.git
-```
+### Текущие возможности проекта:
 
-```
-cd kittygram
-```
+- Создание записей от лица зарегистрированного пользователя, редактирование или удаление оных;
+- Получение записей других зарегистрированных пользователей, без возможности модификации оных;
+- Комментирование своих либо чужих записей, получение списка комментариев каждой конкретной записи;
+- Редактирование либо удаление своих комментариев без возможности изменения чужих;
+- Получение списка существующих сообществ, либо детальной информации о каждом отдельном сообществе;
+- Подписка на других зарегистрированных пользователей
 
-Cоздать и активировать виртуальное окружение:
-
-```
-python3 -m venv env
-```
-
-```
-source env/bin/activate
-```
-
-Установить зависимости из файла requirements.txt:
-
-```
-python3 -m pip install --upgrade pip
-```
-
-```
-pip install -r requirements.txt
-```
-
-Выполнить миграции:
-
-```
-python3 manage.py migrate
-```
-
-Запустить проект:
-
-```
-python3 manage.py runserver
-```
-!!!!!!!!!!!!!!!!
 ### Как запустить проект:
 
 Клонировать репозиторий и перейти в него в командной строке:
 
 ```
-git clone https://github.com/yandex-praktikum/kittygram.git
+git clone https://github.com/doomkirov/api_final_yatube.git
 ```
 
 ```
-cd kittygram
+cd api_final_yatube
 ```
 
 Cоздать и активировать виртуальное окружение:
 
 ```
-python3 -m venv env
+py -m venv venv
 ```
 
 ```
-source env/bin/activate
+source venv/scripts/activate
 ```
 
 Установить зависимости из файла requirements.txt:
 
 ```
-python3 -m pip install --upgrade pip
+py -m pip install --upgrade pip
 ```
 
 ```
@@ -78,11 +47,25 @@ pip install -r requirements.txt
 Выполнить миграции:
 
 ```
-python3 manage.py migrate
+cd yatube_api
+```
+
+```
+py manage.py migrate
 ```
 
 Запустить проект:
 
 ```
-python3 manage.py runserver
+py manage.py runserver
 ```
+
+### Примеры запросов к API:
+
+1. Получение публикаций: GET http://127.0.0.1:8000/api/v1/posts/
+2. Лимитирование списка публикаций: GET http://127.0.0.1:8000/api/v1/posts/?limit=2&offset=1
+3. Добавление публикации: POST http://127.0.0.1:8000/api/v1/posts/ {"text": "some_text"}
+4. Получение комментариев: GET http://127.0.0.1:8000/api/v1/posts/1/comments/
+5. Список сообществ: GET http://127.0.0.1:8000/api/v1/groups/
+6. Подписка: POST http://127.0.0.1:8000/api/v1/follow/ {"following" : "username"}
+7. Получить JWT-токен: POST http://127.0.0.1:8000/api/v1/jwt/create/ {"username": "string", "password": "string"}
